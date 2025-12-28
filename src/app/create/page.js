@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Save, Loader2, CheckCircle, AlertCircle, ArrowLeft } from "lucide-react";
+import { Save, Loader2, CheckCircle, AlertCircle, ArrowLeft, Image as ImageIcon, X } from "lucide-react";
 import { RippleButton } from "@/components/ripple-button";
 import { SidebarTools } from "@/components/templates/upload/SidebarTools";
 import { TemplateEditor } from "@/components/templates/upload/TemplateEditor";
@@ -13,6 +13,7 @@ import { fillTemplate, generateDummyData, renderTemplateWithSections } from "@/l
 import { parseTemplate } from "@/lib/template-parser";
 import { templates as templatesApi } from "@/lib/api";
 import { useAuth } from "@/hooks/useAuth";
+import { uploadTemplateThumbnail } from "@/services/uploadService";
 
 export default function CreateTemplatePage() {
   const router = useRouter();
@@ -35,8 +36,12 @@ export default function CreateTemplatePage() {
   const [parsingResult, setParsingResult] = useState(null);
   const [scrollToLine, setScrollToLine] = useState(null);
   const [highlightedSection, setHighlightedSection] = useState(null);
+  const [thumbnailFile, setThumbnailFile] = useState(null);
+  const [thumbnailPreview, setThumbnailPreview] = useState(null);
+  const [isUploadingThumbnail, setIsUploadingThumbnail] = useState(false);
   const debounceTimerRef = useRef(null);
   const parsingTimerRef = useRef(null);
+  const thumbnailInputRef = useRef(null);
 
   // Real-time parsing
   useEffect(() => {
@@ -132,6 +137,45 @@ export default function CreateTemplatePage() {
     };
   }, [htmlTemplate, generatePreview]);
 
+  // Handle thumbnail file select
+  const handleThumbnailSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/gif"];
+    if (!allowedTypes.includes(file.type)) {
+      setError(`Invalid file type. Allowed: ${allowedTypes.join(", ")}`);
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      setError("File size exceeds 5MB limit");
+      return;
+    }
+
+    setThumbnailFile(file);
+    setError(null);
+
+    // Create preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setThumbnailPreview(reader.result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Handle remove thumbnail
+  const handleRemoveThumbnail = () => {
+    setThumbnailFile(null);
+    setThumbnailPreview(null);
+    if (thumbnailInputRef.current) {
+      thumbnailInputRef.current.value = "";
+    }
+  };
+
   // Handle save
   const handleSave = async () => {
     if (!name.trim() || !htmlTemplate.trim()) {
@@ -150,6 +194,25 @@ export default function CreateTemplatePage() {
     setSuccess(false);
 
     try {
+      let finalThumbnailUrl = null;
+
+      // Upload thumbnail if selected
+      if (thumbnailFile) {
+        setIsUploadingThumbnail(true);
+        console.log("📤 [CreateTemplate] Uploading thumbnail...");
+        
+        const uploadResult = await uploadTemplateThumbnail(thumbnailFile, null);
+        
+        if (uploadResult.success) {
+          finalThumbnailUrl = uploadResult.url;
+          console.log("✅ [CreateTemplate] Upload successful:", finalThumbnailUrl);
+        } else {
+          throw new Error(uploadResult.error || "Failed to upload thumbnail");
+        }
+        
+        setIsUploadingThumbnail(false);
+      }
+
       // Generate fields from template
       const fields = generateFieldsFromTemplate(htmlTemplate);
       
@@ -168,6 +231,7 @@ export default function CreateTemplatePage() {
         name: name.trim(),
         description: description.trim() || undefined,
         html_template: htmlTemplate,
+        thumbnail_url: finalThumbnailUrl || undefined,
         fields: fields,
         sections: sections.length > 0 ? sections : undefined,
       });
@@ -183,6 +247,7 @@ export default function CreateTemplatePage() {
     } catch (err) {
       console.error("Error saving template:", err);
       setError(err.message || err.error || "Terjadi kesalahan saat menyimpan template");
+      setIsUploadingThumbnail(false);
     } finally {
       setIsSaving(false);
     }
@@ -238,15 +303,54 @@ export default function CreateTemplatePage() {
             />
           </div>
 
+          {/* Thumbnail Upload */}
+          <div className="flex items-center gap-2">
+            <input
+              ref={thumbnailInputRef}
+              type="file"
+              accept="image/jpeg,image/jpg,image/png,image/webp,image/gif"
+              onChange={handleThumbnailSelect}
+              className="hidden"
+              id="thumbnail-upload"
+              disabled={isSaving || isUploadingThumbnail}
+            />
+            <label
+              htmlFor="thumbnail-upload"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-black/40 border border-white/10 hover:bg-black/60 cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+            >
+              <ImageIcon size={16} className="text-primary" />
+              <span className="text-white">{thumbnailFile ? "Change" : "Thumbnail"}</span>
+            </label>
+            
+            {/* Thumbnail Preview */}
+            {thumbnailPreview && (
+              <div className="relative w-10 h-10 rounded-lg overflow-hidden border border-white/10">
+                <img
+                  src={thumbnailPreview}
+                  alt="Thumbnail preview"
+                  className="w-full h-full object-cover"
+                />
+                <button
+                  type="button"
+                  onClick={handleRemoveThumbnail}
+                  className="absolute top-0 right-0 p-1 bg-red-500/80 hover:bg-red-500 rounded-bl-lg transition-colors"
+                  disabled={isSaving || isUploadingThumbnail}
+                >
+                  <X size={12} className="text-white" />
+                </button>
+              </div>
+            )}
+          </div>
+
           <RippleButton
             onClick={handleSave}
-            disabled={isSaving || !name.trim() || !htmlTemplate.trim()}
+            disabled={isSaving || isUploadingThumbnail || !name.trim() || !htmlTemplate.trim()}
             className="px-4 py-2 rounded-lg bg-primary hover:opacity-90 text-primary-foreground font-medium transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
-            {isSaving ? (
+            {isSaving || isUploadingThumbnail ? (
               <>
                 <Loader2 size={16} className="animate-spin" />
-                <span>Saving...</span>
+                <span>{isUploadingThumbnail ? "Uploading..." : "Saving..."}</span>
               </>
             ) : (
               <>
