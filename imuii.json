@@ -1,0 +1,11 @@
+{
+  "name": "imuii-template",
+  "framework": "nextjs",
+  "language": "javascript",
+  "buildCommand": "next build",
+  "startCommand": "next start",
+  "domain": "studio",
+  "email": "d.raihan2004@gmail.com",
+  "secretKey": "imuii_8522de0a1e696517b6e00053d1df3e356e445811eae689ec0513c24355a9afa7",
+  "repoUrl": "https://github.com/Lab-Sisjarkom-IMUII/studio-42c327a7.git"
+}
