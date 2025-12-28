@@ -10,6 +10,7 @@ import apiClient from "../api-client";
  * @param {string} [data.name] - Name (optional)
  * @returns {Promise<Object>} Response dengan token dan uploader data
  */
+
 export async function register(data) {
   try {
     const response = await apiClient.post("/template-uploaders/register", data);
