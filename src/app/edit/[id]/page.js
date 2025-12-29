@@ -326,7 +326,7 @@ export default function EditTemplatePage() {
                   />
                   <label
                     htmlFor="thumbnail-upload"
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-black/40 border border-white/10 hover:bg-black/60 cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[--muted] border border-[--border] hover:bg-[--card] cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                   >
                     <ImageIcon size={16} className="text-primary" />
                     <span className="text-white">{thumbnailFile ? "Change Thumbnail" : "Upload Thumbnail"}</span>

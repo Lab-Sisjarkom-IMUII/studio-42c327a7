@@ -91,10 +91,10 @@ export function RegisterForm() {
   };
 
   return (
-    <Card className="max-w-md w-full mx-auto">
+    <Card className="max-w-md w-full mx-auto shadow-2xl">
       <CardHeader>
-        <CardTitle>Buat Akun Baru</CardTitle>
-        <CardDescription>
+        <CardTitle className="text-2xl">Buat Akun Baru</CardTitle>
+        <CardDescription className="text-base">
           Daftar untuk mulai membuat dan berbagi template Anda untuk imuii.id
         </CardDescription>
       </CardHeader>
@@ -180,7 +180,7 @@ export function RegisterForm() {
                 type="checkbox"
                 checked={formData.acceptTerms}
                 onChange={(e) => setFormData({ ...formData, acceptTerms: e.target.checked })}
-                className="w-4 h-4 rounded border-white/10 bg-black/40 text-primary focus:ring-primary mt-0.5"
+                className="w-4 h-4 rounded border-[--border] bg-[--muted] text-primary focus:ring-primary mt-0.5"
               />
               <span className="text-sm text-foreground">
                 Saya menyetujui{" "}

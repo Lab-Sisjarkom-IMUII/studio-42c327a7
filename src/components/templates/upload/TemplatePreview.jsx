@@ -107,7 +107,7 @@ export function TemplatePreview({ htmlContent, isGenerating, onRefresh, highligh
   };
 
   return (
-    <div className="h-full flex flex-col bg-zinc-900">
+    <div className="h-full flex flex-col bg-[--muted]">
       {/* Preview Header */}
       <div className="glass border-b border-white/10 px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -121,7 +121,7 @@ export function TemplatePreview({ htmlContent, isGenerating, onRefresh, highligh
 
         <div className="flex items-center gap-2">
           {/* View Mode Toggle */}
-          <div className="flex items-center gap-1 p-1 rounded-lg bg-black/40 border border-white/10">
+          <div className="flex items-center gap-1 p-1 rounded-lg bg-[--muted] border border-[--border]">
             <button
               onClick={() => setViewMode("desktop")}
               className={`p-1.5 rounded transition ${
@@ -172,9 +172,9 @@ export function TemplatePreview({ htmlContent, isGenerating, onRefresh, highligh
       </div>
 
       {/* Preview Content */}
-      <div className="flex-1 overflow-auto relative bg-zinc-900 flex items-center justify-center p-4">
+      <div className="flex-1 overflow-auto relative bg-[--muted] flex items-center justify-center p-4">
         {isGenerating && (
-          <div className="absolute inset-0 flex items-center justify-center bg-zinc-900/80 z-20">
+          <div className="absolute inset-0 flex items-center justify-center bg-[--muted]/80 z-20">
             <Loader2 className="animate-spin text-primary" size={32} />
           </div>
         )}

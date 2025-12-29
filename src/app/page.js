@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Search, Filter, ArrowRight, Loader2 } from "lucide-react";
+import { motion } from "framer-motion";
+import { Search, Filter, ArrowRight, Loader2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { TemplateGrid } from "@/components/templates/TemplateGrid";
@@ -59,29 +60,105 @@ export default function HomePage() {
     <div className="min-h-screen">
       {/* Hero Section */}
       <section className="relative py-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
-        <div className="max-w-7xl mx-auto text-center">
-          <h1 className="text-5xl md:text-6xl font-bold mb-6">
-            <span className="bg-gradient-to-r from-white via-primary to-accent bg-clip-text text-transparent">
-              studio.imuii.id
-            </span>
-          </h1>
-          <p className="text-xl text-zinc-400 max-w-2xl mx-auto mb-8">
-            Jelajahi koleksi template portfolio dan CV berkualitas tinggi untuk <a href="https://imuii.id" target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary/80">imuii.id</a>.
-            Buat, upload, dan bagikan template Anda dengan komunitas.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/create">
-              <Button variant="accent" size="lg">
-                Buat Template
-                <ArrowRight size={20} className="ml-2" />
-              </Button>
-            </Link>
-            <Link href="/faq">
-              <Button variant="outline" size="lg">
-                Pelajari Lebih Lanjut
-              </Button>
-            </Link>
-          </div>
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <motion.div
+            className="absolute top-20 left-10 w-72 h-72 bg-primary/20 rounded-full blur-3xl"
+            animate={{
+              x: [0, 100, 0],
+              y: [0, 50, 0],
+              scale: [1, 1.2, 1],
+            }}
+            transition={{
+              duration: 20,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          />
+          <motion.div
+            className="absolute bottom-20 right-10 w-96 h-96 bg-accent/20 rounded-full blur-3xl"
+            animate={{
+              x: [0, -100, 0],
+              y: [0, -50, 0],
+              scale: [1, 1.3, 1],
+            }}
+            transition={{
+              duration: 25,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          />
+        </div>
+
+        <div className="max-w-7xl mx-auto text-center relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6">
+              <motion.span
+                className="bg-gradient-to-r from-white via-primary to-accent bg-clip-text text-transparent inline-block"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+              >
+                studio.imuii.id
+              </motion.span>
+            </h1>
+            <motion.p
+              className="text-xl md:text-2xl text-zinc-400 max-w-2xl mx-auto mb-8 leading-relaxed"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+            >
+              Jelajahi koleksi template portfolio dan CV berkualitas tinggi untuk{" "}
+              <a
+                href="https://imuii.id"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary hover:text-primary/80 transition-colors font-medium"
+              >
+                imuii.id
+              </a>
+              . Buat, upload, dan bagikan template Anda dengan komunitas.
+            </motion.p>
+            <motion.div
+              className="flex flex-col sm:flex-row gap-4 justify-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
+              <Link href="/create">
+                <Button
+                  variant="accent"
+                  size="lg"
+                  className="group relative overflow-hidden shadow-lg shadow-accent/20 hover:shadow-accent/40 transition-all duration-300"
+                >
+                  <span className="relative z-10 flex items-center">
+                    Buat Template
+                    <ArrowRight size={20} className="ml-2 group-hover:translate-x-1 transition-transform" />
+                  </span>
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-r from-accent to-primary opacity-0 group-hover:opacity-100 transition-opacity"
+                    initial={false}
+                  />
+                </Button>
+              </Link>
+              <Link href="/faq">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="group border-2 border-primary/30 hover:border-primary/50 hover:bg-primary/10 transition-all duration-300"
+                >
+                  <span className="flex items-center">
+                    Pelajari Lebih Lanjut
+                    <Sparkles size={18} className="ml-2 text-primary group-hover:animate-pulse" />
+                  </span>
+                </Button>
+              </Link>
+            </motion.div>
+          </motion.div>
         </div>
       </section>
 
@@ -110,7 +187,7 @@ export default function HomePage() {
                   className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
                     selectedCategory === category.id
                       ? "bg-primary text-primary-foreground"
-                      : "bg-black/40 text-foreground hover:bg-white/5"
+                      : "bg-[--muted] text-foreground hover:bg-white/5"
                   }`}
                 >
                   {category.name} ({category.count})

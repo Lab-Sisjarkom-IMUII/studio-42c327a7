@@ -292,14 +292,14 @@ export default function CreateTemplatePage() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Template name..."
-              className="px-4 py-2 rounded-lg bg-black/40 border border-white/10 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 text-white placeholder-zinc-500 transition-all text-sm w-48"
+              className="px-4 py-2 rounded-lg bg-[--muted] border border-[--border] focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 text-foreground placeholder-zinc-500 transition-all text-sm w-48"
             />
             <input
               type="text"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Description (optional)..."
-              className="px-4 py-2 rounded-lg bg-black/40 border border-white/10 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 text-white placeholder-zinc-500 transition-all text-sm w-64"
+              className="px-4 py-2 rounded-lg bg-[--muted] border border-[--border] focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 text-foreground placeholder-zinc-500 transition-all text-sm w-64"
             />
           </div>
 
@@ -316,7 +316,7 @@ export default function CreateTemplatePage() {
             />
             <label
               htmlFor="thumbnail-upload"
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-black/40 border border-white/10 hover:bg-black/60 cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[--muted] border border-[--border] hover:bg-[--card] cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
             >
               <ImageIcon size={16} className="text-primary" />
               <span className="text-white">{thumbnailFile ? "Change" : "Thumbnail"}</span>

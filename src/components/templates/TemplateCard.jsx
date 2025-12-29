@@ -34,7 +34,7 @@ export function TemplateCard({ template }) {
 
   return (
     <Card className="group hover:scale-[1.02] transition-transform duration-300 overflow-hidden">
-      <div className="relative w-full h-48 overflow-hidden bg-black/20">
+      <div className="relative w-full h-48 overflow-hidden bg-[--muted]">
         <img
           src={thumbnailUrl}
           alt={templateName}

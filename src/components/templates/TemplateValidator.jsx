@@ -99,15 +99,15 @@ export function TemplateValidator({ htmlTemplate, parsingResult, onSectionClick 
         </div>
 
         <div className="grid grid-cols-3 gap-2 text-xs">
-          <div className="p-2 rounded bg-black/20 border border-white/5">
+          <div className="p-2 rounded bg-[--muted] border border-[--border]">
             <div className="text-zinc-400">Sections</div>
             <div className="text-white font-semibold mt-1">{sections?.length || 0}</div>
           </div>
-          <div className="p-2 rounded bg-black/20 border border-white/5">
+          <div className="p-2 rounded bg-[--muted] border border-[--border]">
             <div className="text-zinc-400">Warnings</div>
             <div className="text-white font-semibold mt-1">{warnings?.length || 0}</div>
           </div>
-          <div className="p-2 rounded bg-black/20 border border-white/5">
+          <div className="p-2 rounded bg-[--muted] border border-[--border]">
             <div className="text-zinc-400">Errors</div>
             <div className="text-white font-semibold mt-1">{errors?.length || 0}</div>
           </div>
@@ -123,7 +123,7 @@ export function TemplateValidator({ htmlTemplate, parsingResult, onSectionClick 
           </div>
           <div className="space-y-2">
             {errors.map((error, index) => (
-              <div key={index} className="text-xs text-red-300 bg-black/20 p-2 rounded border border-red-500/20">
+              <div key={index} className="text-xs text-red-300 bg-[--muted] p-2 rounded border border-red-500/20">
                 {error}
               </div>
             ))}
@@ -140,7 +140,7 @@ export function TemplateValidator({ htmlTemplate, parsingResult, onSectionClick 
           </div>
           <div className="space-y-2">
             {warnings.map((warning, index) => (
-              <div key={index} className="text-xs text-yellow-300 bg-black/20 p-2 rounded border border-yellow-500/20">
+              <div key={index} className="text-xs text-yellow-300 bg-[--muted] p-2 rounded border border-yellow-500/20">
                 {warning}
               </div>
             ))}
@@ -169,7 +169,7 @@ export function TemplateValidator({ htmlTemplate, parsingResult, onSectionClick 
                 exit={{ height: 0, opacity: 0 }}
                 className="overflow-hidden"
               >
-                <pre className="text-xs bg-black/40 p-3 rounded border border-white/5 overflow-x-auto font-mono text-zinc-300">
+                <pre className="text-xs bg-[--muted] p-3 rounded border border-[--border] overflow-x-auto font-mono text-zinc-300">
                   {headContent}
                 </pre>
               </motion.div>
@@ -199,7 +199,7 @@ export function TemplateValidator({ htmlTemplate, parsingResult, onSectionClick 
                 exit={{ height: 0, opacity: 0 }}
                 className="overflow-hidden"
               >
-                <pre className="text-xs bg-black/40 p-3 rounded border border-white/5 overflow-x-auto font-mono text-zinc-300">
+                <pre className="text-xs bg-[--muted] p-3 rounded border border-[--border] overflow-x-auto font-mono text-zinc-300">
                   {bodyAttributes || "(empty)"}
                 </pre>
               </motion.div>
@@ -225,7 +225,7 @@ export function TemplateValidator({ htmlTemplate, parsingResult, onSectionClick 
               return (
                 <div
                   key={index}
-                  className="border border-white/10 rounded-lg overflow-hidden bg-black/20"
+                  className="border border-[--border] rounded-lg overflow-hidden bg-[--muted]"
                 >
                   <button
                     onClick={() => toggleSection(index)}
@@ -254,7 +254,7 @@ export function TemplateValidator({ htmlTemplate, parsingResult, onSectionClick 
                         exit={{ height: 0, opacity: 0 }}
                         className="overflow-hidden border-t border-white/10"
                       >
-                        <div className="p-3 space-y-3 bg-black/10">
+                        <div className="p-3 space-y-3 bg-[--card]">
                           <div className="grid grid-cols-2 gap-2 text-xs">
                             <div>
                               <div className="text-zinc-400 mb-1">Type</div>
@@ -292,7 +292,7 @@ export function TemplateValidator({ htmlTemplate, parsingResult, onSectionClick 
                               <Code size={12} />
                               HTML Preview
                             </div>
-                            <pre className="text-xs bg-black/40 p-2 rounded border border-white/5 overflow-x-auto font-mono text-zinc-300 max-h-32 overflow-y-auto">
+                            <pre className="text-xs bg-[--muted] p-2 rounded border border-[--border] overflow-x-auto font-mono text-zinc-300 max-h-32 overflow-y-auto">
                               {htmlPreview}
                               {section.htmlContent.length > 200 && "..."}
                             </pre>

@@ -6,8 +6,8 @@ export function Card({ children, className, ...props }) {
   return (
     <div
       className={cn(
-        "glass rounded-xl p-6 border border-white/10",
-        "hover:border-primary/30 transition-all duration-300",
+        "glass rounded-xl p-6 border border-[--border]",
+        "hover:border-primary/30 hover:shadow-lg hover:shadow-primary/10 transition-all duration-300",
         className
       )}
       {...props}

@@ -111,7 +111,7 @@ export default function MyTemplatesPage() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="px-4 py-2 rounded-lg bg-black/40 border border-white/10 text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                className="px-4 py-2 rounded-lg bg-[--muted] border border-[--border] text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               >
                 <option value="newest">Terbaru</option>
                 <option value="oldest">Terlama</option>

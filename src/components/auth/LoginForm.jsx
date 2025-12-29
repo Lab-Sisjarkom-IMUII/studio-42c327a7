@@ -69,10 +69,10 @@ export function LoginForm() {
   };
 
   return (
-    <Card className="max-w-md w-full mx-auto">
+    <Card className="max-w-md w-full mx-auto shadow-2xl">
       <CardHeader>
-        <CardTitle>Masuk ke Akun</CardTitle>
-        <CardDescription>
+        <CardTitle className="text-2xl">Masuk ke Akun</CardTitle>
+        <CardDescription className="text-base">
           Masuk untuk mengakses template Anda dan membuat template baru untuk imuii.id
         </CardDescription>
       </CardHeader>
@@ -120,7 +120,7 @@ export function LoginForm() {
                 type="checkbox"
                 checked={formData.rememberMe}
                 onChange={(e) => setFormData({ ...formData, rememberMe: e.target.checked })}
-                className="w-4 h-4 rounded border-white/10 bg-black/40 text-primary focus:ring-primary"
+                className="w-4 h-4 rounded border-[--border] bg-[--muted] text-primary focus:ring-primary"
               />
               <span className="text-sm text-foreground">Ingat saya</span>
             </label>

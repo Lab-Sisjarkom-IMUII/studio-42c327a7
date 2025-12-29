@@ -20,11 +20,11 @@ export function Input({
       <input
         className={cn(
           "w-full px-4 py-2 rounded-lg",
-          "bg-black/40 border border-white/10",
+          "bg-[--muted] border border-[--border]",
           "text-foreground placeholder:text-zinc-500",
-          "focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent",
-          "transition-all duration-200",
-          error && "border-red-500 focus:ring-red-500",
+          "focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent focus:shadow-lg focus:shadow-primary/20",
+          "transition-all duration-300",
+          error && "border-red-500 focus:ring-red-500 focus:shadow-red-500/20",
           className
         )}
         {...props}
@@ -59,11 +59,11 @@ export function Textarea({
         rows={rows}
         className={cn(
           "w-full px-4 py-2 rounded-lg",
-          "bg-black/40 border border-white/10",
+          "bg-[--muted] border border-[--border]",
           "text-foreground placeholder:text-zinc-500",
-          "focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent",
-          "transition-all duration-200 resize-none",
-          error && "border-red-500 focus:ring-red-500",
+          "focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent focus:shadow-lg focus:shadow-primary/20",
+          "transition-all duration-300 resize-none",
+          error && "border-red-500 focus:ring-red-500 focus:shadow-red-500/20",
           className
         )}
         {...props}

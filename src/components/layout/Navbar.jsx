@@ -16,16 +16,19 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3">
-            <Image
-              src="/MainLogo.png"
-              alt="IMUII Studio"
-              width={32}
-              height={32}
-              className="w-8 h-8"
-              priority
-            />
-            <span className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary to-accent rounded-lg blur-md opacity-0 group-hover:opacity-50 transition-opacity duration-300" />
+              <Image
+                src="/MainLogo.png"
+                alt="IMUII Studio"
+                width={32}
+                height={32}
+                className="w-8 h-8 relative z-10 transition-transform duration-300 group-hover:scale-110"
+                priority
+              />
+            </div>
+            <span className="text-xl font-bold bg-gradient-to-r from-primary via-primary to-accent bg-clip-text text-transparent group-hover:from-primary group-hover:via-accent group-hover:to-primary transition-all duration-500">
               studio.imuii.id
             </span>
           </Link>

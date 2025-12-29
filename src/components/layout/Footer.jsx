@@ -13,15 +13,18 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="col-span-1 md:col-span-2">
-            <div className="flex items-center gap-3 mb-4">
-              <Image
-                src="/MainLogo.png"
-                alt="IMUII Studio"
-                width={32}
-                height={32}
-                className="w-8 h-8"
-              />
-              <span className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            <div className="flex items-center gap-3 mb-4 group">
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-br from-primary to-accent rounded-lg blur-md opacity-0 group-hover:opacity-50 transition-opacity duration-300" />
+                <Image
+                  src="/MainLogo.png"
+                  alt="IMUII Studio"
+                  width={32}
+                  height={32}
+                  className="w-8 h-8 relative z-10 transition-transform duration-300 group-hover:scale-110"
+                />
+              </div>
+              <span className="text-xl font-bold bg-gradient-to-r from-primary via-primary to-accent bg-clip-text text-transparent group-hover:from-primary group-hover:via-accent group-hover:to-primary transition-all duration-500">
                 studio.imuii.id
               </span>
             </div>
@@ -68,21 +71,21 @@ export function Footer() {
             <div className="flex gap-3">
               <a
                 href="#"
-                className="p-2 rounded-lg bg-black/40 hover:bg-primary/20 text-zinc-400 hover:text-primary transition-colors"
+                className="p-2 rounded-lg bg-[--muted] hover:bg-primary/20 text-zinc-400 hover:text-primary transition-colors"
                 aria-label="GitHub"
               >
                 <Github size={18} />
               </a>
               <a
                 href="#"
-                className="p-2 rounded-lg bg-black/40 hover:bg-primary/20 text-zinc-400 hover:text-primary transition-colors"
+                className="p-2 rounded-lg bg-[--muted] hover:bg-primary/20 text-zinc-400 hover:text-primary transition-colors"
                 aria-label="Twitter"
               >
                 <Twitter size={18} />
               </a>
               <a
                 href="#"
-                className="p-2 rounded-lg bg-black/40 hover:bg-primary/20 text-zinc-400 hover:text-primary transition-colors"
+                className="p-2 rounded-lg bg-[--muted] hover:bg-primary/20 text-zinc-400 hover:text-primary transition-colors"
                 aria-label="Email"
               >
                 <Mail size={18} />

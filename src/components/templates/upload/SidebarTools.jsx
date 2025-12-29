@@ -88,13 +88,13 @@ export function SidebarTools({ parsingResult, htmlTemplate, onSectionClick }) {
                 Template Examples
               </h3>
               <div className="space-y-2">
-                <button className="w-full text-left px-3 py-2 rounded-lg bg-black/20 hover:bg-black/40 border border-white/5 transition text-xs">
+                <button className="w-full text-left px-3 py-2 rounded-lg bg-[--muted] hover:bg-[--card] border border-[--border] transition text-xs">
                   Basic Portfolio
                 </button>
-                <button className="w-full text-left px-3 py-2 rounded-lg bg-black/20 hover:bg-black/40 border border-white/5 transition text-xs">
+                <button className="w-full text-left px-3 py-2 rounded-lg bg-[--muted] hover:bg-[--card] border border-[--border] transition text-xs">
                   Modern Dark
                 </button>
-                <button className="w-full text-left px-3 py-2 rounded-lg bg-black/20 hover:bg-black/40 border border-white/5 transition text-xs">
+                <button className="w-full text-left px-3 py-2 rounded-lg bg-[--muted] hover:bg-[--card] border border-[--border] transition text-xs">
                   Minimalist
                 </button>
               </div>
@@ -113,7 +113,7 @@ export function SidebarTools({ parsingResult, htmlTemplate, onSectionClick }) {
                 <Link
                   href="/faq"
                   target="_blank"
-                  className="flex items-center justify-between w-full px-3 py-2 rounded-lg bg-black/20 hover:bg-black/40 border border-white/5 transition text-xs group"
+                  className="flex items-center justify-between w-full px-3 py-2 rounded-lg bg-[--muted] hover:bg-[--card] border border-[--border] transition text-xs group"
                 >
                   <span>Template Guide</span>
                   <ExternalLink size={12} className="text-zinc-400 group-hover:text-primary" />
@@ -121,7 +121,7 @@ export function SidebarTools({ parsingResult, htmlTemplate, onSectionClick }) {
                 <Link
                   href="/faq"
                   target="_blank"
-                  className="flex items-center justify-between w-full px-3 py-2 rounded-lg bg-black/20 hover:bg-black/40 border border-white/5 transition text-xs group"
+                  className="flex items-center justify-between w-full px-3 py-2 rounded-lg bg-[--muted] hover:bg-[--card] border border-[--border] transition text-xs group"
                 >
                   <span>Getting Started</span>
                   <ExternalLink size={12} className="text-zinc-400 group-hover:text-primary" />

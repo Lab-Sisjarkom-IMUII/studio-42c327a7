@@ -63,7 +63,7 @@ export function TemplateEditor({ value, onChange, errors = [], scrollToLine, hig
         {/* Line Numbers */}
         <div
           ref={lineNumbersRef}
-          className="w-12 shrink-0 bg-black/20 border-r border-white/5 overflow-y-auto text-xs font-mono py-2"
+          className="w-12 shrink-0 bg-[--muted] border-r border-[--border] overflow-y-auto text-xs font-mono py-2"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
           onScroll={handleLineNumbersScroll}
         >
