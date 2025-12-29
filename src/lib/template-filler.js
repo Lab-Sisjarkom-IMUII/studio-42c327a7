@@ -241,6 +241,37 @@ export function fillTemplate(template, data) {
     return arr.map(formatFn).join("\n");
   };
 
+  // Handle Handlebars conditional blocks {{#if field}} ... {{/if}} BEFORE replacing fields
+  // This must be done first to avoid replacing placeholders inside conditionals
+  if (data.personalInfo) {
+    const info = data.personalInfo;
+    
+    // Handle {{#if email}} ... {{/if}} blocks
+    filled = filled.replace(/\{\{#if\s+email\}\}([\s\S]*?)\{\{\/if\}\}/gi, (match, content) => {
+      return info.email ? content : "";
+    });
+    
+    // Handle {{#if linkedin}} ... {{/if}} blocks
+    filled = filled.replace(/\{\{#if\s+linkedin\}\}([\s\S]*?)\{\{\/if\}\}/gi, (match, content) => {
+      return info.linkedin ? content : "";
+    });
+    
+    // Handle {{#if github}} ... {{/if}} blocks
+    filled = filled.replace(/\{\{#if\s+github\}\}([\s\S]*?)\{\{\/if\}\}/gi, (match, content) => {
+      return info.github ? content : "";
+    });
+    
+    // Handle {{#if website}} ... {{/if}} blocks
+    filled = filled.replace(/\{\{#if\s+website\}\}([\s\S]*?)\{\{\/if\}\}/gi, (match, content) => {
+      return info.website ? content : "";
+    });
+    
+    // Handle {{#if phone}} ... {{/if}} blocks
+    filled = filled.replace(/\{\{#if\s+phone\}\}([\s\S]*?)\{\{\/if\}\}/gi, (match, content) => {
+      return info.phone ? content : "";
+    });
+  }
+
   // Replace simple fields
   if (data.personalInfo) {
     const info = data.personalInfo;

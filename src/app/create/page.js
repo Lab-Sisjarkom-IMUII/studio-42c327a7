@@ -43,30 +43,38 @@ export default function CreateTemplatePage() {
   const parsingTimerRef = useRef(null);
   const thumbnailInputRef = useRef(null);
 
-  // Real-time parsing
+  // Real-time parsing dengan debounce yang lebih baik untuk template besar
   useEffect(() => {
     if (parsingTimerRef.current) {
       clearTimeout(parsingTimerRef.current);
     }
 
+    // Dynamic debounce: lebih lama untuk template besar
+    const templateSize = htmlTemplate.length;
+    const debounceTime = templateSize > 50000 ? 1000 : templateSize > 20000 ? 600 : 300;
+
     parsingTimerRef.current = setTimeout(() => {
       if (htmlTemplate && htmlTemplate.trim()) {
-        try {
-          const result = parseTemplate(htmlTemplate);
-          setParsingResult(result);
-        } catch (error) {
-          setParsingResult({
-            sections: [],
-            headContent: "",
-            bodyAttributes: "",
-            warnings: [],
-            errors: [error.message || "Failed to parse template"],
-          });
-        }
+        // Gunakan setTimeout untuk tidak memblokir UI thread
+        setTimeout(() => {
+          try {
+            const result = parseTemplate(htmlTemplate);
+            setParsingResult(result);
+          } catch (error) {
+            console.error("Parsing error:", error);
+            setParsingResult({
+              sections: [],
+              headContent: "",
+              bodyAttributes: "",
+              warnings: [],
+              errors: [error.message || "Failed to parse template"],
+            });
+          }
+        }, 0);
       } else {
         setParsingResult(null);
       }
-    }, 300);
+    }, debounceTime);
 
     return () => {
       if (parsingTimerRef.current) {
@@ -75,57 +83,86 @@ export default function CreateTemplatePage() {
     };
   }, [htmlTemplate]);
 
-  // Generate preview dengan dummy data
-  const generatePreview = useCallback(() => {
-    if (!htmlTemplate.trim()) {
-      setPreviewHtml("");
-      return;
-    }
-
-    setIsGeneratingPreview(true);
-    try {
-      const fields = generateFieldsFromTemplate(htmlTemplate);
-      const dummyData = generateDummyData(fields);
-
-      let filled = "";
-
-      try {
-        const parsed = parseTemplate(htmlTemplate);
-
-        if (parsed.sections && parsed.sections.length > 0) {
-          const templateObj = {
-            headContent: parsed.headContent || "",
-            bodyAttributes: parsed.bodyAttributes || "",
-          };
-
-          filled = renderTemplateWithSections(parsed.sections, dummyData, {}, templateObj);
-        } else {
-          filled = fillTemplate(htmlTemplate, dummyData);
-        }
-      } catch (parseError) {
-        console.warn("Template parsing failed, using fallback:", parseError.message);
-        filled = fillTemplate(htmlTemplate, dummyData);
+  // Generate preview dengan dummy data - menggunakan useRef untuk menghindari dependency loop
+  const generatePreviewRef = useRef(null);
+  
+  // Update ref setiap kali htmlTemplate berubah
+  useEffect(() => {
+    generatePreviewRef.current = () => {
+      if (!htmlTemplate.trim()) {
+        setPreviewHtml("");
+        return;
       }
 
-      setPreviewHtml(filled);
-    } catch (err) {
-      console.error("Error generating preview:", err);
-      setError("Error generating preview: " + err.message);
-    } finally {
-      setIsGeneratingPreview(false);
-    }
+      setIsGeneratingPreview(true);
+      
+      // Gunakan setTimeout untuk tidak memblokir UI thread, terutama untuk template besar
+      setTimeout(() => {
+        try {
+          const fields = generateFieldsFromTemplate(htmlTemplate);
+          const dummyData = generateDummyData(fields);
+
+          let filled = "";
+
+          try {
+            // Untuk template besar, skip parsing sections dan langsung gunakan fillTemplate
+            const templateSize = htmlTemplate.length;
+            if (templateSize > 100000) {
+              // Template terlalu besar, langsung fill tanpa parsing sections
+              filled = fillTemplate(htmlTemplate, dummyData);
+            } else {
+              const parsed = parseTemplate(htmlTemplate);
+
+              if (parsed.sections && parsed.sections.length > 0) {
+                const templateObj = {
+                  headContent: parsed.headContent || "",
+                  bodyAttributes: parsed.bodyAttributes || "",
+                };
+
+                filled = renderTemplateWithSections(parsed.sections, dummyData, {}, templateObj);
+              } else {
+                filled = fillTemplate(htmlTemplate, dummyData);
+              }
+            }
+          } catch (parseError) {
+            console.warn("Template parsing failed, using fallback:", parseError.message);
+            filled = fillTemplate(htmlTemplate, dummyData);
+          }
+
+          setPreviewHtml(filled);
+        } catch (err) {
+          console.error("Error generating preview:", err);
+          setError("Error generating preview: " + err.message);
+        } finally {
+          setIsGeneratingPreview(false);
+        }
+      }, 0);
+    };
   }, [htmlTemplate]);
 
-  // Debounced auto-preview
+  // Stable function untuk manual refresh (tidak berubah setiap render)
+  const generatePreview = useCallback(() => {
+    if (generatePreviewRef.current) {
+      generatePreviewRef.current();
+    }
+  }, []);
+
+  // Debounced auto-preview dengan debounce dinamis berdasarkan ukuran template
   useEffect(() => {
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current);
     }
 
     if (htmlTemplate.trim()) {
+      // Dynamic debounce: lebih lama untuk template besar
+      const templateSize = htmlTemplate.length;
+      const debounceTime = templateSize > 50000 ? 1500 : templateSize > 20000 ? 800 : 500;
+      
       debounceTimerRef.current = setTimeout(() => {
-        generatePreview();
-      }, 500);
+        if (generatePreviewRef.current) {
+          generatePreviewRef.current();
+        }
+      }, debounceTime);
     } else {
       setPreviewHtml("");
     }
@@ -135,7 +172,7 @@ export default function CreateTemplatePage() {
         clearTimeout(debounceTimerRef.current);
       }
     };
-  }, [htmlTemplate, generatePreview]);
+  }, [htmlTemplate]);
 
   // Handle thumbnail file select
   const handleThumbnailSelect = (e) => {
@@ -214,7 +251,18 @@ export default function CreateTemplatePage() {
       }
 
       // Generate fields from template
-      const fields = generateFieldsFromTemplate(htmlTemplate);
+      const fieldsArray = generateFieldsFromTemplate(htmlTemplate);
+      
+      // Convert fields array to map/object (backend expects map[string]interface{}, not array)
+      const fieldsMap = fieldsArray.reduce((acc, field) => {
+        acc[field.key] = {
+          type: field.type,
+          label: field.label,
+          required: field.required || false,
+          description: field.description || null,
+        };
+        return acc;
+      }, {});
       
       // Prepare sections from parsing result
       const sections = parsingResult?.sections?.map((section, index) => ({
@@ -232,7 +280,7 @@ export default function CreateTemplatePage() {
         description: description.trim() || undefined,
         html_template: htmlTemplate,
         thumbnail_url: finalThumbnailUrl || undefined,
-        fields: fields,
+        fields: fieldsMap, // Send as object/map, not array
         sections: sections.length > 0 ? sections : undefined,
       });
 

@@ -33,39 +33,49 @@ export function parseTemplate(htmlTemplate) {
     const bodyContent = bodyMatch[1];
 
     // Parse sections using markers: <!-- [SECTION_TYPE] [OPTIONAL] Section Name -->
+    // Fix: Collect all markers first to avoid infinite loop with regex lastIndex
     const sectionPattern = /<!--\s*\[([A-Z_]+)\]\s*(?:\[OPTIONAL\])?\s*(.*?)\s*-->/gi;
+    const sectionMarkers = [];
     let match;
-    let order = 1;
 
+    // First pass: Find all section markers
     while ((match = sectionPattern.exec(bodyContent)) !== null) {
       const sectionType = match[1].toLowerCase();
       const sectionName = match[2].trim() || sectionType;
       const isOptional = match[0].includes("[OPTIONAL]");
 
-      // Find the next section marker or end of body
-      const nextMatchIndex = sectionPattern.lastIndex;
-      sectionPattern.lastIndex = 0;
-      const nextMatch = sectionPattern.exec(bodyContent.substring(nextMatchIndex));
-      const sectionEndIndex = nextMatch
-        ? nextMatchIndex + nextMatch.index
-        : bodyContent.length;
+      sectionMarkers.push({
+        type: sectionType,
+        name: sectionName,
+        isOptional,
+        startIndex: match.index,
+        endIndex: match.index + match[0].length,
+      });
+    }
 
-      // Extract HTML content between markers
-      const sectionStartIndex = match.index + match[0].length;
-      const htmlContent = bodyContent
-        .substring(sectionStartIndex, sectionEndIndex)
-        .trim();
+    // Second pass: Extract HTML content between markers
+    let order = 1;
+    for (let i = 0; i < sectionMarkers.length; i++) {
+      const marker = sectionMarkers[i];
+      const nextMarker = sectionMarkers[i + 1];
+
+      // Find section content (dari setelah comment sampai sebelum comment berikutnya)
+      const sectionStart = marker.endIndex;
+      const sectionEnd = nextMarker ? nextMarker.startIndex : bodyContent.length;
+
+      // Extract HTML content dari section
+      const htmlContent = bodyContent.substring(sectionStart, sectionEnd).trim();
 
       if (!htmlContent) {
-        warnings.push(`Section "${sectionName}" (${sectionType}) is empty`);
+        warnings.push(`Section "${marker.name}" (${marker.type}) is empty`);
       }
 
       sections.push({
-        type: sectionType,
-        name: sectionName,
+        type: marker.type,
+        name: marker.name,
         htmlContent,
         order,
-        isOptional,
+        isOptional: marker.isOptional,
         condition: null,
       });
 
