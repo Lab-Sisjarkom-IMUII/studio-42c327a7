@@ -17,22 +17,9 @@ export const metadata = {
   title: "studio.imuii.id - Upload & Share Templates",
   description: "Platform untuk berbagi dan menemukan template portfolio dan CV terbaik untuk imuii.id. Buat, upload, dan gunakan template berkualitas tinggi.",
   icons: {
-    icon: [
-      { url: "/MainLogo.png", sizes: "32x32", type: "image/png" },
-      { url: "/MainLogo.png", sizes: "16x16", type: "image/png" },
-      { url: "/MainLogo.png", sizes: "any", type: "image/png" },
-    ],
+    icon: "/MainLogo.png",
     shortcut: "/MainLogo.png",
-    apple: [
-      { url: "/MainLogo.png", sizes: "180x180", type: "image/png" },
-    ],
-    other: [
-      {
-        rel: "icon",
-        type: "image/png",
-        url: "/MainLogo.png",
-      },
-    ],
+    apple: "/MainLogo.png",
   },
   openGraph: {
     type: "website",
