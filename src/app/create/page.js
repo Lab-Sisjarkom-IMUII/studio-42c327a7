@@ -3,21 +3,42 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Save, Loader2, CheckCircle, AlertCircle, ArrowLeft, Image as ImageIcon, X } from "lucide-react";
+import { Save, Loader2, CheckCircle, AlertCircle, ArrowLeft, Image as ImageIcon, X, Code, Layout } from "lucide-react";
 import { RippleButton } from "@/components/ripple-button";
 import { SidebarTools } from "@/components/templates/upload/SidebarTools";
 import { TemplateEditor } from "@/components/templates/upload/TemplateEditor";
 import { TemplatePreview } from "@/components/templates/upload/TemplatePreview";
+import { VisualBuilder } from "@/components/templates/visual-builder/VisualBuilder";
 import { generateFieldsFromTemplate } from "@/lib/template-utils";
 import { fillTemplate, generateDummyData, renderTemplateWithSections } from "@/lib/template-filler";
 import { parseTemplate } from "@/lib/template-parser";
 import { templates as templatesApi } from "@/lib/api";
 import { useAuth } from "@/hooks/useAuth";
 import { uploadTemplateThumbnail } from "@/services/uploadService";
+import { convertFullCodeToSections, convertSectionsToFullCode } from "@/lib/visual-builder-utils";
 
 export default function CreateTemplatePage() {
   const router = useRouter();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [htmlTemplate, setHtmlTemplate] = useState("");
+  const [editorMode, setEditorMode] = useState("fullcode"); // 'fullcode' | 'visual'
+  const [isVisualBuilderLocked, setIsVisualBuilderLocked] = useState(false);
+
+  // Check if visual builder should be locked (if accessed from studio.imuii.id)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const hostname = window.location.hostname;
+      const isLocked = hostname === 'studio.imuii.id' || hostname.includes('studio.imuii.id');
+      setIsVisualBuilderLocked(isLocked);
+      
+      // If locked and currently in visual mode, switch to fullcode
+      if (isLocked && editorMode === 'visual') {
+        setEditorMode('fullcode');
+      }
+    }
+  }, [editorMode]);
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -25,9 +46,6 @@ export default function CreateTemplatePage() {
       router.push("/login");
     }
   }, [isAuthenticated, authLoading, router]);
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [htmlTemplate, setHtmlTemplate] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
@@ -42,9 +60,17 @@ export default function CreateTemplatePage() {
   const debounceTimerRef = useRef(null);
   const parsingTimerRef = useRef(null);
   const thumbnailInputRef = useRef(null);
+  const syncFromVisualRef = useRef(false);
+  const syncFromFullCodeRef = useRef(false);
 
   // Real-time parsing dengan debounce yang lebih baik untuk template besar
   useEffect(() => {
+    // Skip parsing jika sync dari visual mode
+    if (syncFromVisualRef.current) {
+      syncFromVisualRef.current = false;
+      return;
+    }
+
     if (parsingTimerRef.current) {
       clearTimeout(parsingTimerRef.current);
     }
@@ -332,6 +358,55 @@ export default function CreateTemplatePage() {
           </div>
         </div>
 
+        {/* Mode Switcher */}
+        <div className="flex items-center gap-2 bg-[--muted] rounded-lg p-1 border border-[--border]">
+          <button
+            onClick={() => {
+              // Sync visual to full code before switching
+              if (editorMode === 'visual') {
+                // HTML sudah di-sync via onHtmlChange dari VisualBuilder
+              }
+              setEditorMode('fullcode');
+            }}
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center gap-2 ${
+              editorMode === 'fullcode'
+                ? 'bg-primary text-primary-foreground'
+                : 'text-zinc-400 hover:text-white'
+            }`}
+          >
+            <Code size={16} />
+            <span>Full Code</span>
+          </button>
+          <div className="relative">
+            <button
+              onClick={() => {
+                if (!isVisualBuilderLocked) {
+                  // Sync full code to visual before switching
+                  if (editorMode === 'fullcode' && htmlTemplate) {
+                    syncFromFullCodeRef.current = true;
+                  }
+                  setEditorMode('visual');
+                }
+              }}
+              disabled={isVisualBuilderLocked}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center gap-2 relative ${
+                isVisualBuilderLocked
+                  ? 'bg-zinc-700/50 text-zinc-500 cursor-not-allowed opacity-50'
+                  : editorMode === 'visual'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'text-zinc-400 hover:text-white'
+              }`}
+              title={isVisualBuilderLocked ? 'Visual Builder dikunci untuk domain ini' : 'Visual Builder'}
+            >
+              <Layout size={16} />
+              <span>Visual Builder</span>
+              {isVisualBuilderLocked && (
+                <span className="ml-1 text-xs">🔒</span>
+              )}
+            </button>
+          </div>
+        </div>
+
         <div className="flex items-center gap-3">
           {/* Template Info Form */}
           <div className="flex items-center gap-2">
@@ -443,42 +518,98 @@ export default function CreateTemplatePage() {
         </motion.div>
       )}
 
-      {/* Main Content Area - Split View */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* Sidebar Tools */}
-        <SidebarTools 
-          parsingResult={parsingResult} 
-          htmlTemplate={htmlTemplate}
-          onSectionClick={(line, section) => {
-            setScrollToLine(line);
-            setHighlightedSection(section);
-            setTimeout(() => {
-              setHighlightedSection(null);
-            }, 3000);
-          }}
-        />
-
-        {/* Editor (Left) */}
-        <div className="flex-1 flex flex-col border-r border-white/10">
-          <TemplateEditor
-            value={htmlTemplate}
-            onChange={setHtmlTemplate}
-            errors={parsingResult?.errors || []}
-            scrollToLine={scrollToLine}
-            highlightedSection={highlightedSection}
+      {/* Main Content Area - Conditional Rendering berdasarkan Mode */}
+      {editorMode === 'fullcode' ? (
+        <div className="flex-1 flex overflow-hidden">
+          {/* Sidebar Tools */}
+          <SidebarTools 
+            parsingResult={parsingResult} 
+            htmlTemplate={htmlTemplate}
+            onSectionClick={(line, section) => {
+              setScrollToLine(line);
+              setHighlightedSection(section);
+              setTimeout(() => {
+                setHighlightedSection(null);
+              }, 3000);
+            }}
           />
-        </div>
 
-        {/* Preview (Right) */}
-        <div className="flex-1 flex flex-col">
-          <TemplatePreview
-            htmlContent={previewHtml}
-            isGenerating={isGeneratingPreview}
-            onRefresh={generatePreview}
-            highlightedSection={highlightedSection}
-          />
+          {/* Editor (Left) */}
+          <div className="flex-1 flex flex-col border-r border-white/10">
+            <TemplateEditor
+              value={htmlTemplate}
+              onChange={(value) => {
+                syncFromFullCodeRef.current = false;
+                setHtmlTemplate(value);
+              }}
+              errors={parsingResult?.errors || []}
+              scrollToLine={scrollToLine}
+              highlightedSection={highlightedSection}
+            />
+          </div>
+
+          {/* Preview (Right) */}
+          <div className="flex-1 flex flex-col">
+            <TemplatePreview
+              htmlContent={previewHtml}
+              isGenerating={isGeneratingPreview}
+              onRefresh={generatePreview}
+              highlightedSection={highlightedSection}
+            />
+          </div>
         </div>
-      </div>
+      ) : isVisualBuilderLocked ? (
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center space-y-4 p-8">
+            <div className="text-6xl mb-4">🔒</div>
+            <h3 className="text-xl font-semibold text-white">Visual Builder Dikunci</h3>
+            <p className="text-zinc-400 max-w-md">
+              Fitur Visual Builder tidak tersedia untuk domain <span className="font-mono text-primary">studio.imuii.id</span>.
+              <br />
+              Silakan gunakan mode <strong>Full Code</strong> untuk membuat template.
+            </p>
+            <RippleButton
+              onClick={() => setEditorMode('fullcode')}
+              className="px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition flex items-center gap-2 mx-auto"
+            >
+              <Code size={18} />
+              Buka Full Code Editor
+            </RippleButton>
+          </div>
+        </div>
+      ) : (
+        <div className="flex-1 flex overflow-hidden">
+          {/* Visual Builder Mode */}
+          <div className="flex-1 flex flex-col">
+            <VisualBuilder
+              key={`visual-${editorMode}`}
+              initialHtmlTemplate={htmlTemplate}
+              onHtmlChange={(newHtml) => {
+                syncFromVisualRef.current = true;
+                setHtmlTemplate(newHtml);
+                // Trigger preview update
+                if (generatePreviewRef.current) {
+                  generatePreviewRef.current();
+                }
+              }}
+              onSectionsChange={(sections) => {
+                // Optional: bisa digunakan untuk tracking sections
+                console.log('Sections updated:', sections);
+              }}
+            />
+          </div>
+
+          {/* Preview (Right) */}
+          <div className="flex-1 flex flex-col border-l border-white/10">
+            <TemplatePreview
+              htmlContent={previewHtml}
+              isGenerating={isGeneratingPreview}
+              onRefresh={generatePreview}
+              highlightedSection={highlightedSection}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
