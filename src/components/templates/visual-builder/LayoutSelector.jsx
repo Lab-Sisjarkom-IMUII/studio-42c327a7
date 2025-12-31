@@ -3,7 +3,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Check } from 'lucide-react';
 import { getSectionPreset, getSectionTemplate } from './SectionPresets';
-
 /**
  * Layout Selector Modal
  * Modal untuk memilih layout/gaya section saat ditambahkan
