@@ -14,7 +14,7 @@ import { sectionsToLayoutJSON, layoutJSONToSections } from '@/lib/visual-builder
 /**
  * Droppable Canvas Area
  */
-function DroppableCanvas({ children, isEmpty } {
+function DroppableCanvas({ children, isEmpty }) {
   const { setNodeRef, isOver } = useDroppable({
     id: 'canvas-drop-zone',
     data: {
